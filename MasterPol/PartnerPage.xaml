@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:MasterPol"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="PartnerPage" FontFamily="Segoe UI">
+      Title="PartnerPage" FontFamily="Segoe UI" IsVisibleChanged="Page_IsVisibleChanged">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -43,7 +43,11 @@
                         <TextBlock Text="{Binding TopPartner, StringFormat=Рейтинг: {0}}" FontSize="16" Margin="5" Grid.Row="3"></TextBlock>
                         <TextBlock Text=""></TextBlock>
 
-                        <Button Name="EditBtn" Grid.Row="2" Content="Редактировать" Click="EditBtn_Click" HorizontalAlignment="Right"></Button>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.RowSpan="4" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Discount, StringFormat={}{0} %}" FontSize="25"/>
+                        </StackPanel>
+
+                        <Button Name="EditBtn" Grid.Row="3" Content="Редактировать" Click="EditBtn_Click" HorizontalAlignment="Right" ></Button>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

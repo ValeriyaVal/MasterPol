@@ -11,7 +11,8 @@ namespace MasterPol
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.Linq;
+
     public partial class Partner
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -19,7 +20,7 @@ namespace MasterPol
         {
             this.PartnerProduct = new HashSet<PartnerProduct>();
         }
-    
+
         public int IDPartner { get; set; }
         public int IDTypePartner { get; set; }
         public string NamePartner { get; set; }
@@ -31,9 +32,29 @@ namespace MasterPol
         public string AdressePartner { get; set; }
         public string INNPartner { get; set; }
         public int TopPartner { get; set; }
-    
+
         public virtual PartnerType PartnerType { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PartnerProduct> PartnerProduct { get; set; }
+
+        public int Discount
+        {
+            get
+            {
+                // Подсчитываем общее количество проданных товаров данным партнёром
+                int totalQuantity = PartnerProduct?.Sum(pp => pp.CountProduct) ?? 0;
+
+                if (totalQuantity < 10000)
+                    return 0;
+                else if (totalQuantity < 50000)
+                    return 5;
+                else if (totalQuantity < 300000)
+                    return 10;
+                else
+                    return 15;
+            }
+
+
+        }
     }
 }

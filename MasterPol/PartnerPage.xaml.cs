@@ -49,5 +49,11 @@ namespace MasterPol
         {
             Manager.MainFrame.Navigate(new AddEditPage(null));
         }
+
+        private void Page_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var currentPartner = MasterPolEntities.GetContext().Partner.ToList();
+            PartnerListView.ItemsSource = currentPartner;
+        }
     }
 }

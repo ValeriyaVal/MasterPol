@@ -2,44 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace MasterPol
 {
-    /// <summary>
-    /// Логика взаимодействия для AddEditPage.xaml
-    /// </summary>
     public partial class AddEditPage : Page
     {
         private Partner _currentPartner = new Partner();
+
+        // Свойство для ComboBox
+        public List<PartnerType> PartnerTypes { get; set; }
+
         public AddEditPage(Partner SelectedPartner)
         {
             InitializeComponent();
 
-            if (SelectedPartner != null)
-                _currentPartner = SelectedPartner;
+            // Загружаем типы партнёров из базы
+            PartnerTypes = MasterPolEntities.GetContext().PartnerType.ToList();
 
+            // Если редактируем — используем выбранного, иначе создаём нового
             _currentPartner = SelectedPartner ?? new Partner();
-            DataContext = _currentPartner; // сначала
-            ComboType.ItemsSource = MasterPolEntities.GetContext().PartnerType.ToList(); // потом
 
-            //if (_currentPartner.IDTypePartner != null)
-            //    ComboType.SelectedValue = _currentPartner.IDTypePartner;
+            // Привязываем всё к контексту
+            DataContext = this; // чтобы ComboBox видел PartnerTypes
+            this.DataContext = _currentPartner;
 
-            // Если редактируем, выставляем тип транспорта
-            //if (!string.IsNullOrEmpty(_currentPartner.NamePartnerType))
-            //    ComboType.SelectedValue = _currentPartner.NamePartnerType;
-
-
+            // Подключаем ComboBox к источнику вручную (если нужно)
+            ComboType.ItemsSource = PartnerTypes;
         }
 
         private void SaveBtn_Click(object sender, RoutedEventArgs e)
@@ -73,38 +63,39 @@ namespace MasterPol
             if (_currentPartner.TopPartner <= 0)
                 errors.AppendLine("Рейтинг партнера не может быть равен или меньше 0");
 
-            if (_currentPartner.PartnerType == null)
+            if (_currentPartner.IDTypePartner <= 0)
                 errors.AppendLine("Выберите тип партнера");
-            //if (string.IsNullOrWhiteSpace(_currentPartner.NameTypePartner))
-            //    errors.AppendLine("");
 
             if (errors.Length > 0)
             {
                 MessageBox.Show(errors.ToString());
                 return;
             }
-            var allPartners = MasterPolEntities.GetContext().Partner.Where(p=> p.NamePartner == _currentPartner.NamePartner && p.IDPartner!=_currentPartner.IDPartner).ToList();
 
-            if (allPartners.Count == 0)
+            var context = MasterPolEntities.GetContext();
+
+            var sameName = context.Partner
+                .FirstOrDefault(p => p.NamePartner == _currentPartner.NamePartner && p.IDPartner != _currentPartner.IDPartner);
+
+            if (sameName != null)
             {
-                if (_currentPartner.IDPartner == 0)
-                    MasterPolEntities.GetContext().Partner.Add(_currentPartner);
-
-                try
-                {
-                    MasterPolEntities.GetContext().SaveChanges();
-                    MessageBox.Show("Данные сохранены");
-                    Manager.MainFrame.GoBack();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
+                MessageBox.Show("Партнёр с таким названием уже существует");
+                return;
             }
-            else MessageBox.Show("Уже существует данный партнер");
-            
 
+            if (_currentPartner.IDPartner == 0)
+                context.Partner.Add(_currentPartner);
+
+            try
+            {
+                context.SaveChanges();
+                MessageBox.Show("Данные сохранены");
+                Manager.MainFrame.GoBack();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка сохранения: " + ex.Message);
+            }
         }
-
     }
 }

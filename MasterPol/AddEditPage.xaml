@@ -30,10 +30,13 @@
         <StackPanel Orientation="Horizontal" Grid.Row="1" VerticalAlignment="Center">
             <TextBlock Text="Выберите тип: " FontSize="20" ></TextBlock>
             <ComboBox x:Name="ComboType"
-          Width="150" Height="30" FontSize="20"
+          Width="150"
+          Height="30"
+          FontSize="20"
+          ItemsSource="{Binding PartnerTypes}" 
           DisplayMemberPath="NamePartnerType"
           SelectedValuePath="IDPartnerType"
-          SelectedValue="{Binding IDTypePartner, Mode=TwoWay}" />
+          SelectedValue="{Binding IDTypePartner, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--<ComboBox Name="ComboType" Width="150" Height="30" FontSize="20" 
                       SelectedValuePath="Content"
